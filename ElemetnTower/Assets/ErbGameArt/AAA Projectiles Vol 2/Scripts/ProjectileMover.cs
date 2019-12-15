@@ -4,9 +4,10 @@ using UnityEngine;
 using Element;
 public class ProjectileMover : MonoBehaviour
 {
-    public float speed = 15f;
+    [SerializeField]public float speed = 15f;
     public float hitOffset = 0f;
-    public float damage = 30;
+    [SerializeField]public float damage = 150;
+    private float percentage = 0.3f;
     public bool UseFirePointRotation;
     public Vector3 rotationOffset = new Vector3(0, 0, 0);
     public GameObject hit;
@@ -16,7 +17,7 @@ public class ProjectileMover : MonoBehaviour
     [SerializeField] private ElementTypes type = ElementTypes.Wind;
     //Modified for ElementTower
     public Transform FollowTarget = null;
-
+    Tower Towers;
     void Start()
     {
         rb = GetComponent<Rigidbody>();
@@ -59,7 +60,6 @@ public class ProjectileMover : MonoBehaviour
         }
     }
 
-    //https ://docs.unity3d.com/ScriptReference/Rigidbody.OnCollisionEnter.html
     void OnCollisionEnter(Collision collision)
     {
         //Lock all axes movement and rotation
@@ -105,33 +105,16 @@ public class ProjectileMover : MonoBehaviour
     void ShootDamage(Transform EnemyTarget)
     {
         float newDamage = 0f;
-        EnemyMovement Enemy = EnemyTarget.GetComponent<EnemyMovement>();
-        if (Enemy != null)
+        Enemy enemy = EnemyTarget.GetComponent<Enemy>();
+        if (enemy != null)
         {
-            /*
-            if(type == ElementTypes.Wind)
-            {
-                newDamage = DamageEngine.ElementCombatAlgorithm(damage, type);
-            }
-            */
-            
+            if(type == ElementTypes.Glacier) { newDamage = DamageEngine.ElementCombatAlgorithm(damage, type); enemy.Slow(percentage); }
+            if(type == ElementTypes.Ocean) { newDamage = DamageEngine.ElementCombatAlgorithm(damage, type);}
+            if(type == ElementTypes.Wind) { newDamage = DamageEngine.ElementCombatAlgorithm(damage, type); }
+            if(type == ElementTypes.Fire) { newDamage = DamageEngine.ElementCombatAlgorithm(damage + Random.Range(1, 5), type); } else { newDamage = DamageEngine.ElementCombatAlgorithm(damage, type); }
+            if(type == ElementTypes.Desert) { newDamage = DamageEngine.ElementCombatAlgorithm(damage, type); newDamage += Random.Range(0f, 10f); }
             switch (type)
             {
-                case ElementTypes.Crystal:
-                    newDamage = DamageEngine.ElementCombatAlgorithm(damage, type);
-                    
-                    break;
-                case ElementTypes.Desert:
-                    newDamage = DamageEngine.ElementCombatAlgorithm(damage, type);
-                    break;
-                case ElementTypes.Fire:
-                    newDamage = DamageEngine.ElementCombatAlgorithm(damage, type);
-                    
-                    break;
-                case ElementTypes.Glacier:
-                    newDamage = DamageEngine.ElementCombatAlgorithm(damage, type);
-                    Enemy.SlowDownSpeed();
-                    break;
                 case ElementTypes.Light:
                     newDamage = DamageEngine.ElementCombatAlgorithm(damage, type);
                     break;
@@ -150,14 +133,10 @@ public class ProjectileMover : MonoBehaviour
                 case ElementTypes.Thunder:
                     newDamage = DamageEngine.ElementCombatAlgorithm(damage, type);
                     break;
-                case ElementTypes.Wind:
-                    newDamage = DamageEngine.ElementCombatAlgorithm(damage, type);
-                    Enemy.PullBack();
-                    break;
-
+                
             }
             
         }
-        Enemy.TakeDamage(newDamage);
+        enemy.TakeDamage(newDamage);
     }
 }

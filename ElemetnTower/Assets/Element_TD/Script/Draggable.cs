@@ -85,7 +85,7 @@ public class Draggable : MonoBehaviour, IBeginDragHandler,IDragHandler,IEndDragH
         return Tower;
     }
 
-    // this is to set TowerCreate true to destory itself
+    // this is to set TowerCreate true and to destory itself
     public void TowerSuccessCreate()
     {
         TowerCreate = true;
@@ -95,9 +95,18 @@ public class Draggable : MonoBehaviour, IBeginDragHandler,IDragHandler,IEndDragH
     {
         //Update parent everytime of event
         parentToReturnTo = transform.parent;
-        Debug.Log("We click on the card");
+        if (bm.isChildOfShop(this.gameObject))
+        {
+            float money = bm.Money;
+            float towermoney = this.gameObject.GetComponent<CardInfoShow>().CardMoney;
+            if (money < towermoney)
+            {
+                return;
+            }
+            bm.Money -= towermoney;
+        }
+        this.gameObject.GetComponent<CardInfoShow>().MoneyText.enabled = false;
         bm.CardClicked(this.gameObject);
-       
     }
 
 }
